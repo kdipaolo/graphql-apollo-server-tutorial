@@ -33,7 +33,8 @@ const getMe = async req => {
 
 const app = express()
 app.use(cors())
-const port = 8000
+
+const port = process.env.PORT || 8000
 
 const userLoader = new DataLoader(keys => batchUsers(keys, models))
 
@@ -121,9 +122,10 @@ const createUsersWithMessages = async date => {
 }
 
 const isTest = !!process.env.TEST_DATABASE
+const isProduction = !!process.env.DATABASE_URL
 
-sequelize.sync({ force: isTest }).then(async () => {
-  if (isTest) {
+sequelize.sync({ force: isTest || isProduction }).then(async () => {
+  if (isTest || isProduction) {
     createUsersWithMessages(new Date())
   }
   httpServer.listen({ port }, () => {
